@@ -161,7 +161,7 @@ String.prototype.format = function () {
                     var dragcontrols = new THREE.DragControls( splineHelperObjects, camera, renderer.domElement ); //
                     dragcontrols.enabled = false;
                     dragcontrols.addEventListener( 'hoveron', function ( event ) {
-                       // console.log(document);
+                       // //////console.log(document);
                        // document.activeElement.insertAdjacentText("xw");
                         //$('#'+event.object.id).html("stringValue($(this))");
 
