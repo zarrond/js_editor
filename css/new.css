@@ -1,5 +1,51 @@
-.button {
-	border: 1px solid #bbb;
-	border-bottom: 1px solid #a0a0a0;
-	cursor: hand;
+.up-group{
+    cursor: pointer;
+    cursor: hand;
+
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    
+
+       
+}
+.btn-primary{
+    background-color: #313131;
+    color: #f0f0f0;
+    border: none;
+    cursor: hand;
+}
+.btn1{
+
+   
+}
+
+
+.menu{
+    position: fixed;
+    top: 25px;
+    left: 0px;
+    padding: 3px;
+    transform: translateX(-100%);   
+    background: gray;
+    color: #f0f0f0;
+    text-align: center;
+    transition: transform 500ms ease-in-out; 
+  }
+  .menuMoveRight{
+    transform: translateX(0);
+   }
+
+.popup{
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+}
+.rangeSlider{
+    width: 20px;
+    padding: 2px;
+
+}
+.rangeSlider:hover{
+    width: 100px;
 }

@@ -18,7 +18,7 @@ String.prototype.format = function () {
                 var positions = [];
                 var point = new THREE.Vector3();
     
-                var geometry = new THREE.BoxBufferGeometry( 20, 20, 20 );
+                var geometry = new THREE.BoxBufferGeometry( 15, 15, 15 );
                 var transformControl;
     
                 var ARC_SEGMENTS = 200;
@@ -34,20 +34,59 @@ String.prototype.format = function () {
                     removePoint: removePoint,
                     exportSpline: exportSpline
                 };
+
+                var infoOpened  =false;
+
+
     
                 init();
                 animate();
     
                 function init() {
-                    var btn = document.createElement("BUTTON");        // Create a <button> element
-                    var t = document.createTextNode("CLICK ME");       // Create a text node
-                    btn.appendChild(t);                                // Append the text to <button>
-                    document.body.appendChild(btn);
-                    btn.addEventListener("click",function(){
-                        window.alert("sometext");
-                      }); 
+                    
+                    
+                    
+                    //document.body.appendChild(bbtn);
+                    var menu = document.getElementById("menu");
+                    //var btn = document.createElement('btn1');
+                    var btn1 = document.getElementById('btn1');
+             
+                    btn1.addEventListener("click",function(){
+                        infoOpened = !infoOpened;
+                        console.log(infoOpened);
+                        menu.classList.toggle("menuMoveRight");
+                    }); 
+  //menu.classList.toggle("menuMoveLeft");
+                    
+
+                    var btn2 = document.getElementById('btn2');
+                    
+                            btn2.addEventListener("click",function(){
+                                
+                                document.getElementById("info1").textContent = document.getElementById("info1").textContent+"1";
+                            });
+                    
+                   
+                    //console.log(document.getElementById('btn1').textContent)
+                    //panel.appendChild(btn);
+                    // panel.addEventListener('hoveron',function(){
+                    //     window.alert("1");
+                    
+                    // });
+
+
+                    var slider = document.getElementById("range");
+                    slider.addEventListener("change", function(){
+                        geometry.scale(2,2,2);
+                        console.log(slider.value);
+                        updateSplineOutline();  
+                    })
+
+
+
+
                     container = document.getElementById( 'container' );
-    
+                    
                     scene = new THREE.Scene();
                     scene.background = new THREE.Color( 0xf0f0f0 );
     
@@ -91,9 +130,7 @@ String.prototype.format = function () {
                     renderer.shadowMap.enabled = true;
                     container.appendChild( renderer.domElement );
     
-                    // stats = new Stats();
-                    // container.appendChild( stats.dom );
-    
+                    
                     var gui = new dat.GUI();
     
                     gui.add( params, 'uniform' );
@@ -106,6 +143,7 @@ String.prototype.format = function () {
                     
                     gui.add( params, 'addPoint' );
                     gui.add( params, 'removePoint' );
+                    gui.add( params, 'exportSpline' );
                     gui.open();
 
 
@@ -171,7 +209,8 @@ String.prototype.format = function () {
                     var dragcontrols = new THREE.DragControls( splineHelperObjects, camera, renderer.domElement ); //
                     dragcontrols.enabled = false;
                     dragcontrols.addEventListener( 'hoveron', function ( event ) {
-                       // //////console.log(document);
+                       console.log(document.getElementById(event.object.id));
+                       console.log(event.object);
                        // document.activeElement.insertAdjacentText("xw");
                         //$('#'+event.object.id).html("stringValue($(this))");
 
@@ -183,6 +222,16 @@ String.prototype.format = function () {
                         //     tooltipSpan.textContent('test');
                         // };
                         
+
+
+                        if(infoOpened){
+                            document.getElementById("info1").textContent = event.object.id+" "+event.object.position.x+" "+event.object.position.y+" "+event.object.position.z;
+                        }
+
+                        // var popup = document.createElement("popup");
+                        // popup.textContent = event.object.id;
+
+
                         transformControl.attach( event.object );
                         cancelHideTransform();
     
@@ -399,7 +448,8 @@ String.prototype.format = function () {
     
                     requestAnimationFrame( animate );
                     render();
-                    //stats.update();
+                    
+                    
     
                 }
     
