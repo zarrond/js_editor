@@ -39,7 +39,13 @@ String.prototype.format = function () {
                 animate();
     
                 function init() {
-    
+                    var btn = document.createElement("BUTTON");        // Create a <button> element
+                    var t = document.createTextNode("CLICK ME");       // Create a text node
+                    btn.appendChild(t);                                // Append the text to <button>
+                    document.body.appendChild(btn);
+                    btn.addEventListener("click",function(){
+                        window.alert("sometext");
+                      }); 
                     container = document.getElementById( 'container' );
     
                     scene = new THREE.Scene();
@@ -85,8 +91,8 @@ String.prototype.format = function () {
                     renderer.shadowMap.enabled = true;
                     container.appendChild( renderer.domElement );
     
-                    stats = new Stats();
-                    container.appendChild( stats.dom );
+                    // stats = new Stats();
+                    // container.appendChild( stats.dom );
     
                     var gui = new dat.GUI();
     
@@ -104,6 +110,10 @@ String.prototype.format = function () {
 
 
                     //Popper
+
+                    var t = new Tippy();
+
+
 
                     
     
@@ -389,7 +399,7 @@ String.prototype.format = function () {
     
                     requestAnimationFrame( animate );
                     render();
-                    stats.update();
+                    //stats.update();
     
                 }
     
