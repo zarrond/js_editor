@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-<link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+
 	<head>
+		<link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
 		<title>Visor</title>		
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
@@ -26,17 +27,18 @@
 	</head>
 	<body>
 		<link rel = "stylesheet" href = "css/new.css"/>
-		
+		<link rel = "stylesheet" href = "css/tippy.css"/>
 		<div id="container"></div>
 			
 		<div class="up-group">
 			<button id = "btn1" type="button" class="btn btn-primary btn1">info</button>
-			<button id = "btn2" type="button" class="btn btn-primary">2</button>
-			<button id = "btn3" type="button" class="btn btn-primary">3</button>
+			<button id = "btn2" type="button" class="btn btn-primary">add1</button>
+			<button id = "btn3" type="button" class="btn btn-primary">RC</button>
 			<input type="range" id="range" class = "rangeSlider" min="3" max="60" step="2" value="10" />
 		</div>
 		<div class="menu" id="menu">
 			<p class = 'info1' id = 'info1'>Select something</p>
+			<p class = 'info2' id = 'info2'>mouse info</p>
 		</div>
 			
 
@@ -50,9 +52,14 @@
 		<script src="js/OrbitControls.js"></script>
 		<script src="js/TransformControls.js"></script>
 
-		
+		<script src="js/WEBGL.js"></script>
 		<script src="js/dat.gui.js"></script>
 		<script src="js/tippy.js"></script>
+
+		<script src="js/popper.js"></script>
+		<script src="js/index.all.min.js"></script>
+
+		<!-- <script src="src/editor_backup.js"></script> -->
 		<script src="src/editor.js"></script>
 		
 	</body>

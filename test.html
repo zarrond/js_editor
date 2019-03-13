@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<input type="file" id="fileinput" />
+<pre id="numbers"></pre>
+<pre id="contents"></pre>
+<script type="text/javascript">
+
+
+document.getElementById('fileinput').addEventListener('change', readSingleFile, false);
+
+
+  function readSingleFile(evt) {
+    //Retrieve the first (and only!) File from the FileList object
+    var f = evt.target.files[0]; 
+    console.log(f);
+    
+
+    if (f) {
+      var r = new FileReader();
+      
+      r.readAsText(f);
+      r.onload = function(e) { 
+        var txt = e.target.result;
+        
+        document.getElementById("contents").textContent = txt;
+        var array = txt.replace("\n"," ").split(" ");
+        var i = parseInt(array[0]);
+        document.getElementById("numbers").textContent = i;
+        console.log(typeof i);
+      }
+      
+      
+    } else { 
+      alert("Failed to load file");
+    }
+  }
+
+  
+</script>

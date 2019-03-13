@@ -15,17 +15,20 @@
     border: none;
     cursor: hand;
 }
-.btn1{
+/* .btn1{
 
    
+} */
+.lockedButton{    
+    background-color: #818181;    
 }
-
 
 .menu{
     position: fixed;
     top: 25px;
     left: 0px;
     padding: 3px;
+    width: 200px;
     transform: translateX(-100%);   
     background: gray;
     color: #f0f0f0;
