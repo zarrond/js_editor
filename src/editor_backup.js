@@ -165,7 +165,7 @@ String.prototype.format = function () {
                     gui.add( params, 'exportSpline' );
                     gui.open();
 
-x
+
         
         
                     // Controls 

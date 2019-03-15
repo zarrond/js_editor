@@ -10,24 +10,32 @@ String.prototype.format = function () {
                     return str;
     
                 };
+                // requirements
+                var WEBGL = require('../js/WebGL');
+                //var window = require('window')
+                var THREE = require('../js/three')
+                var jsdom = require('jsdom');
+                var document = jsdom.JSDOM;
+
+                //
 
                 // Browser check
-                if ( WEBGL.isWebGLAvailable() === false ) { 
+                if ( WEBGL.isWebGLAvailable === false ) { 
                       
                     document.body.appendChild( WEBGL.getWebGLErrorMessage() ); 
                      
                 } 
-                if (window.File && window.FileReader && window.FileList && window.Blob) {
-                        // All the File APIs are supported.
-                    } else {
-                        alert('The File APIs are not fully supported in this browser.');
-                    }
+                // if (window.File && window.FileReader && window.FileList && window.Blob) {
+                //         // All the File APIs are supported.
+                //     } else {
+                //         alert('The File APIs are not fully supported in this browser.');
+                //     }
                 //
                     
                 var OPTIONS = {
                     GEOMETRY_SIZE: 15,
                     GRID_HELPER: true,
-                    GUI: false,
+                    GUI: true,
                 };
                 var container, stats;
                 var camera, scene, renderer;
