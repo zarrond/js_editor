@@ -11,32 +11,41 @@ String.prototype.format = function () {
     
                 };
                 // requirements
-                var WEBGL = require('../js/WebGL');
-                //var window = require('window')
-                var THREE = require('../js/three')
-                var jsdom = require('jsdom');
-                var document = jsdom.JSDOM;
+                // var WEBGL = require('../js/WebGL');
+                // //var window = require('window')
+                // var THREE = require('../js/three')
+                // var jsdom = require('jsdom');
+                // var document = jsdom.JSDOM;
 
                 //
 
                 // Browser check
+                THREE.Cache.enabled = true;
+
                 if ( WEBGL.isWebGLAvailable === false ) { 
                       
                     document.body.appendChild( WEBGL.getWebGLErrorMessage() ); 
                      
                 } 
-                // if (window.File && window.FileReader && window.FileList && window.Blob) {
-                //         // All the File APIs are supported.
-                //     } else {
-                //         alert('The File APIs are not fully supported in this browser.');
-                //     }
-                //
+                if (window.File && window.FileReader && window.FileList && window.Blob) {
+                        // All the File APIs are supported.
+                    } else {
+                        alert('The File APIs are not fully supported in this browser.');
+                    }
+                
                     
                 var OPTIONS = {
                     GEOMETRY_SIZE: 15,
                     GRID_HELPER: true,
                     GUI: true,
                 };
+
+                var server = "http://127.0.0.1:8080"
+                var filename = "/Users/TrofimovDM/JS_projects/backend/rawFromTridb.txt";
+                var loadedData;
+
+                var wireGeometry = new THREE.Geometry();
+
                 var container, stats;
                 var camera, scene, renderer;
                 var splineHelperObjects = [];
@@ -71,9 +80,107 @@ String.prototype.format = function () {
                 animate();
     
                 function init() {
-                    
-                    
-                    
+                    var btn4 = document.getElementById("btn4");
+                    btn4.addEventListener("click", loadFile);
+                    //document.addEventListener("DOMContentLoaded",loadFile);
+                    function loadFile(evt) {    
+                        var xmlhttp = new XMLHttpRequest();
+                        xmlhttp.open("GET",server+filename,true);
+                        xmlhttp.send();
+                        xmlhttp.onreadystatechange = function(){
+                          //console.log(xmlhttp);
+                          if(xmlhttp.status == 200 && xmlhttp.readyState == 4){              
+                            loadedData = xmlhttp.responseText.replace(/\n/g," ").split(" "); 
+                            //console.log(loadedData);   
+                            btn4.removeEventListener("click", loadFile);                              
+                            btn4.addEventListener("click", createGeometry);
+                            btn4.classList.toggle("ButtonNotLoaded");
+                          }
+                          if(xmlhttp.status !== 200 && xmlhttp.readyState == 4){
+                            alert("Cannnot load of find\n"+filename+"\n");
+                          }
+                        };
+                        }
+
+
+                    function cG(){
+                        console.log("got data2");
+                        //console.log(wireGeometry);
+                        var _Points_count = parseInt(loadedData[0]);
+                        var _Triags_count = parseInt(loadedData[1]);
+                        
+                        var _s = 2; //shift
+                        var _Points = loadedData.slice(2,_Points_count*3+2).map(Number);
+                        //console.log(loadedData.slice(2,_Points_count*3+2));
+                        
+                        var wireGeometry1 = new THREE.BufferGeometry();
+                        // create a simple square shape. We duplicate the top left and bottom right
+                        // vertices because each vertex needs to appear once per triangle.
+                        var vertices = new Float32Array( _Points );
+                        console.log(vertices);
+                        // itemSize = 3 because there are 3 values (components) per vertex
+                        wireGeometry1.addAttribute( 'position', new THREE.BufferAttribute( vertices, 3 ) );
+                        //geometry.scale(10,10,10);
+                        
+                        var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+                        var mesh1 = new THREE.Mesh( wireGeometry1, material );
+                        scene.add(mesh1);
+                    }
+
+
+
+
+                    function createGeometry()
+                    {
+                        console.log("got data");
+                        console.log(wireGeometry);
+                        var _Points_count = parseInt(loadedData[0]);
+                        var _Triags_count = parseInt(loadedData[1]);
+                        //var Points = [];
+                        var _s = 2; //shift
+                        for( var i = 0; i < _Points_count; i++)
+                        {
+                            var _Point = new THREE.Vector3(parseFloat(loadedData[3*i+_s]), parseFloat(loadedData[3*i+_s+1]), parseFloat(loadedData[3*i+_s+2]))
+                            //Points.push(_Point); 178.449116
+                            wireGeometry.vertices.push(_Point);
+                        }
+                        document.getElementById("info3").textContent = loadedData[3*_Points_count+2] +" ve " + loadedData.length + "\n" + (_Points_count*3+3*_Triags_count+2);
+                        _s = _Points_count*3 + 2;
+                        for( var i = 0; i < _Triags_count; i++)
+                        {
+                            var f = new THREE.Face3(parseInt(loadedData[3*i+_s]), parseInt(loadedData[3*i+_s+1]), parseInt(loadedData[3*i+_s+2]) )
+                            wireGeometry.faces.push(f);
+                        }
+                        //var loader = new THREE.FileLoader();
+                        wireGeometry.computeBoundingSphere();
+                        
+                        var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+                        material.wireframe = true; 
+                        //wireGeometry.scale(0.01,0.01,0.01);
+                        var loadedMesh = new THREE.Mesh( wireGeometry, material ); 
+                        //loadedMesh.scale(0.1,0.1,0.1);
+                        
+                        //render;
+                        var center = wireGeometry.boundingSphere.center;//.multiply(-1);
+                        var d = wireGeometry.boundingSphere.center.distanceTo(new THREE.Vector3(0,0,0));
+                        wireGeometry.translate(center.normalize.x/d, center.normalize.y/d, center.normalize.z/d );
+                        console.log(wireGeometry);
+                        
+
+                        var m = new THREE.Matrix4();
+                        m.makeTranslation(center.normalize().x*d, center.normalize().y*d, center.normalize().z*d );
+                        console.log(m);
+                        console.log(   center.normalize());
+                        console.log(d)
+
+
+                        scene.add( loadedMesh);
+                        wireGeometry.position = new THREE.Vector3(0,0,0);
+                        camera.lookAt(wireGeometry.boundingSphere.center);
+
+                        console.log("got data");
+
+                    }
 
                     var menu = document.getElementById("menu");
                     
@@ -81,7 +188,7 @@ String.prototype.format = function () {
              
                     btn1.addEventListener("click",function(){
                         infoOpened = !infoOpened;
-                        console.log(infoOpened);
+                        console.log(infoOpened);    
                         menu.classList.toggle("menuMoveRight");
                     }); 
 
@@ -92,6 +199,7 @@ String.prototype.format = function () {
                     btn2.addEventListener("click",function(){
                         
                         document.getElementById("info1").textContent = document.getElementById("info1").textContent+"1";
+                        console.log(scene);
                     });
                     
 
@@ -510,11 +618,12 @@ String.prototype.format = function () {
     
                 function render() {
                     
-                    var raycaster = new THREE.Raycaster(); 
-                    raycaster.linePrecision = 3;
-                    raycaster.setFromCamera( mouse, camera );
+                    
                     if(raycastingEnabled){
                         //for(child in scene.children){
+                            var raycaster = new THREE.Raycaster(); 
+                            raycaster.linePrecision = 3;
+                            raycaster.setFromCamera( mouse, camera );
                             var intersects = raycaster.intersectObjects(scene.children, true ); 
                             if ( intersects.length > 0 ) {
                                 

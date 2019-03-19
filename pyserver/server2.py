@@ -2,8 +2,8 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import os
 
 
-web_dir = "C:\\Users\\TrofimovDM\\JS_projects\\backend"
-os.chdir(web_dir)
+# web_dir = "C:\\Users\\TrofimovDM\\JS_projects\\backend"
+# os.chdir(web_dir)
 
 
 class S(BaseHTTPRequestHandler):
@@ -15,13 +15,11 @@ class S(BaseHTTPRequestHandler):
 
     def do_GET(self):
         print("GET request,\nPath: {}\nHeaders:\n{}\n".format( str(self.path), str(self.headers)))
-        self._set_response()
-        data = ''
         print(self.path)
         try:
-            with open(self.path, 'r') as f:
-                data = f.read()
-                self.wfile.write(data.encode('utf-8'))
+            with open(self.path, 'rb') as f:
+                self._set_response()
+                self.wfile.write(f.read())
         except FileNotFoundError:
             self.send_response(404)
             self.send_header('Content-type', 'text/plain')
@@ -30,7 +28,7 @@ class S(BaseHTTPRequestHandler):
 
 
 
-        self.wfile.write("GET request44 for {}".format(self.path).encode('utf-8'))
+    #self.wfile.write("GET request44 for {}".format(self.path).encode('utf-8'))
 
     def do_POST(self):
         content_length = int(self.headers['Content-Length']) # <--- Gets the size of data

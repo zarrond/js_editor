@@ -1,4 +1,4 @@
-var server = "http://127.0.0.1:8080/"
+var server = "http://127.0.0.1:8080"
 var btn = document.getElementById("btn1");
 var btn2 = document.getElementById("btn2");
 btn.addEventListener("click", readSingleFile);
@@ -30,11 +30,19 @@ btn2.addEventListener("click", post);
     var txt = '';
     var xmlhttp = new XMLHttpRequest();
     xmlhttp.onreadystatechange = function(){
-      
+      console.log(xmlhttp);
       if(xmlhttp.status == 200 && xmlhttp.readyState == 4){
-        txt = xmlhttp.responseText;
-        console.log(xmlhttp);
-        document.getElementById("contents").textContent = txt;
+        if(filename.indexOf(".png") !== -1)
+        {
+          txt = xmlhttp.responseText;
+          document.getElementById("myimg").src = txt;
+        }
+        else 
+        {
+          txt = xmlhttp.responseText;
+          
+          document.getElementById("contents").textContent = txt;
+        }
       }
       else{
         document.getElementById("contents").textContent = xmlhttp.status+"\nFile not found";

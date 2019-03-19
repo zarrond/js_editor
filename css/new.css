@@ -15,12 +15,16 @@
     border: none;
     cursor: hand;
 }
-/* .btn1{
-
+.btn4{
+    background-color: #26a69a;
    
-} */
+}
 .lockedButton{    
     background-color: #818181;    
+}
+.ButtonNotLoaded{
+
+    background-color: #f44336; 
 }
 
 .menu{
