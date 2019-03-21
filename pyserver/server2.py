@@ -31,13 +31,23 @@ class S(BaseHTTPRequestHandler):
     #self.wfile.write("GET request44 for {}".format(self.path).encode('utf-8'))
 
     def do_POST(self):
+        import json
+        import time
         content_length = int(self.headers['Content-Length']) # <--- Gets the size of data
         post_data = self.rfile.read(content_length) # <--- Gets the data itself
         print("POST request,\nPath: {}\nHeaders:\n{}\n\nBody:\n{}\n".format(
                 str(self.path), str(self.headers), post_data.decode('utf-8')))
-
+        post_data = post_data.decode('utf-8')
+        dict = json.loads(post_data)
+        with open("C:\\Users\\TrofimovDM\\JS_projects\\backend\\settings.json", "w") as f:
+            json.dump(dict,f)
+        print("\n\n\n"+dict["cmd"])
+        os.system(dict["cmd"])
+        s = ""
+        with open("C:\\Users\\TrofimovDM\\JS_projects\\backend\\java\\samplefile1.txt", 'r') as f:
+            s = f.read()
         self._set_response()
-        self.wfile.write("POST request for {}".format(self.path).encode('utf-8'))
+        self.wfile.write("POST request for {}  {}".format(self.path, s).encode('utf-8'))
 
 
 def run(server_class=HTTPServer, handler_class=S, port=8080):

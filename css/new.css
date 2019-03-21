@@ -27,7 +27,7 @@
     background-color: #f44336; 
 }
 
-.menu{
+.menu, .POSTmenu{
     position: fixed;
     top: 25px;
     left: 0px;
@@ -55,4 +55,35 @@
 }
 .rangeSlider:hover{
     width: 100px;
+}
+.statusLine{
+    position: fixed; /* or absolute */
+    bottom: 0px;
+    left: 10px;
+    font-size: 16px;
+}
+.POSTinput{
+    border: 1px solid #cccccc; 
+    border-radius: 3px; 
+    background: #ffffff !important; 
+    outline: none; 
+    /* height: 24px; 
+    width: 120px;  */
+    color: #313131;
+    font-size: 16px; 
+    font-family: Tahoma; 
+    text-align: center;
+
+    /* border-radius: 3px; //закругление углов (общее)
+    -webkit-border-radius: 3px; //закругление углов (Google Chrome)
+    -moz-border-radius: 3px; //закругление углов (FireFox)
+    -khtml-border-radius: 3px; //закругление углов (Safari)
+    background: #ffffff !important; // желательно прописывать, так как в Chrome при сохранных данных оно может быть желтым
+    outline: none; // удаляет обводку в браузерах хром(желтая) и сафари(синяя)
+    height: 24px; // высота на свое усмотрение
+    width: 120px; // ширина на свое усмотрение
+    color: #cccccc; //цвет шрифта в обычном состоянии
+    font-size: 11px; // Размер шрифта
+    font-family: Tahoma; // Стиль шрифта
+    text-align: center; */
 }

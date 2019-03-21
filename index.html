@@ -35,12 +35,21 @@
 			<button id = "btn2" type="button" class="btn btn-primary">add1</button>
 			<button id = "btn3" type="button" class="btn btn-primary">RC</button>
 			<button id = "btn4" type="button" class="btn btn-primary btn4 ButtonNotLoaded">load</button>
-			<input type="range" id="range" class = "rangeSlider" min="3" max="60" step="2" value="10" />
+			<!-- <input type="range" id="range" class = "rangeSlider" min="3" max="60" step="2" value="10" /> -->
+			<button id = "btn5" type="button" class="btn btn-primary">POST</button>
 		</div>
+		<p class="statusLine" id = "statusLine"></p>
 		<div class="menu" id="menu">
 			<p class = 'info1' id = 'info1'>Select something</p>
 			<p class = 'info2' id = 'info2'>mouse info</p>
 			<p class = 'info3' id = 'info3'>Here</p>
+			<p class = 'info4' id = 'info4'>Zoom</p>
+		</div>
+		<div class="POSTmenu" id="POSTmenu">
+			<p><label>file: <textarea cols="20" rows="3" class = 'POSTinput' id = 'POSTinput0'>no file loaded</textarea></label></p>
+			<p><label>dacc: <input class = 'POSTinput' id = 'POSTinput1'  value="4" onfocus="this.value=''"></label></p>
+			<p><label>vox: <input class = 'POSTinput' id = 'POSTinput2' value="1" onfocus="this.value=''"></label></p>
+			<button id = "POSTbtn" type="button" class="btn btn-primary">POST</button>
 		</div>
 			
 

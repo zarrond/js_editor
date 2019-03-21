@@ -38,6 +38,7 @@ String.prototype.format = function () {
                     GEOMETRY_SIZE: 15,
                     GRID_HELPER: true,
                     GUI: true,
+                    FIX_SRC_AXES: true,
                 };
 
                 var server = "http://127.0.0.1:8080"
@@ -45,6 +46,7 @@ String.prototype.format = function () {
                 var loadedData;
 
                 var wireGeometry = new THREE.Geometry();
+                var loadedMesh;
 
                 var container, stats;
                 var camera, scene, renderer;
@@ -68,12 +70,16 @@ String.prototype.format = function () {
                     chordal: false,
                     addPoint: addPoint,
                     removePoint: removePoint,
-                    exportSpline: exportSpline
+                    exportSpline: exportSpline,
+                    wireframe: true,
+                    helper: true,
+                    _continiousRendering: false,
                 };
-
-                var infoOpened  =false;
+                var OnStart = true;
+                var infoOpened  = false;
+                var POSTOpened = false;
                 var raycastingEnabled = false;
-
+                var controls;
 
     
                 init();
@@ -85,6 +91,7 @@ String.prototype.format = function () {
                     //document.addEventListener("DOMContentLoaded",loadFile);
                     function loadFile(evt) {    
                         var xmlhttp = new XMLHttpRequest();
+                        
                         xmlhttp.open("GET",server+filename,true);
                         xmlhttp.send();
                         xmlhttp.onreadystatechange = function(){
@@ -95,6 +102,7 @@ String.prototype.format = function () {
                             btn4.removeEventListener("click", loadFile);                              
                             btn4.addEventListener("click", createGeometry);
                             btn4.classList.toggle("ButtonNotLoaded");
+                            document.getElementById("POSTinput0").textContent = filename.split("/").slice(-1)[0];
                           }
                           if(xmlhttp.status !== 200 && xmlhttp.readyState == 4){
                             alert("Cannnot load of find\n"+filename+"\n");
@@ -132,6 +140,9 @@ String.prototype.format = function () {
 
                     function createGeometry()
                     {
+                        // statusManager("started loading model");
+                        // sleep(1000);
+                        // render();
                         console.log("got data");
                         console.log(wireGeometry);
                         var _Points_count = parseInt(loadedData[0]);
@@ -140,7 +151,10 @@ String.prototype.format = function () {
                         var _s = 2; //shift
                         for( var i = 0; i < _Points_count; i++)
                         {
-                            var _Point = new THREE.Vector3(parseFloat(loadedData[3*i+_s]), parseFloat(loadedData[3*i+_s+1]), parseFloat(loadedData[3*i+_s+2]))
+                            if(OPTIONS.FIX_SRC_AXES)   //TODO Fix orientation of object
+                                var _Point = new THREE.Vector3(parseFloat(loadedData[3*i+_s]), parseFloat(loadedData[3*i+_s+2]), parseFloat(loadedData[3*i+_s+1]))
+                            else
+                                var _Point = new THREE.Vector3(parseFloat(loadedData[3*i+_s]), parseFloat(loadedData[3*i+_s+1]), parseFloat(loadedData[3*i+_s+2]))
                             //Points.push(_Point); 178.449116
                             wireGeometry.vertices.push(_Point);
                         }
@@ -153,31 +167,52 @@ String.prototype.format = function () {
                         }
                         //var loader = new THREE.FileLoader();
                         wireGeometry.computeBoundingSphere();
-                        
-                        var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
-                        material.wireframe = true; 
+                        wireGeometry.computeFaceNormals();
+                        //var material = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+                        //material.wireframe = true; 
+                        //material.transparent = true;
                         //wireGeometry.scale(0.01,0.01,0.01);
-                        var loadedMesh = new THREE.Mesh( wireGeometry, material ); 
+
+                        var meshMaterial = new THREE.MeshLambertMaterial( {
+                            color: 0xff0000,
+                            opacity: 0.5,
+                            transparent: false,
+                            side: THREE.DoubleSide,
+                        } );
+        
+
+                        
+                        loadedMesh = new THREE.Mesh( wireGeometry, meshMaterial ); 
                         //loadedMesh.scale(0.1,0.1,0.1);
                         
                         //render;
                         var center = wireGeometry.boundingSphere.center;//.multiply(-1);
-                        var d = wireGeometry.boundingSphere.center.distanceTo(new THREE.Vector3(0,0,0));
-                        wireGeometry.translate(center.normalize.x/d, center.normalize.y/d, center.normalize.z/d );
-                        console.log(wireGeometry);
+                        //var d = wireGeometry.boundingSphere.center.distanceTo(new THREE.Vector3(0,0,0));
+                        //wireGeometry.translate(center.normalize.x/d, center.normalize.y/d, center.normalize.z/d );
+                        //console.log(wireGeometry);
                         
 
-                        var m = new THREE.Matrix4();
-                        m.makeTranslation(center.normalize().x*d, center.normalize().y*d, center.normalize().z*d );
-                        console.log(m);
-                        console.log(   center.normalize());
-                        console.log(d)
+                        // var m = new THREE.Matrix4();
+                        // m.makeTranslation(center.normalize().x*d, center.normalize().y*d, center.normalize().z*d );
+                        // console.log(m);
+                        // console.log(   center.normalize());
+                        // console.log(d)
 
-
+                        loadedMesh.castShadow = true;
+                        loadedMesh.receiveShadow = true;
+                        loadedMesh.name = "loadedMesh";
                         scene.add( loadedMesh);
-                        wireGeometry.position = new THREE.Vector3(0,0,0);
-                        camera.lookAt(wireGeometry.boundingSphere.center);
 
+                        var helper = new THREE.FaceNormalsHelper( loadedMesh, 4, 0x00ff00, 0.1 );
+                        helper.name = "helper";
+                       
+                        scene.add( helper );
+                        //wireGeometry.position = new THREE.Vector3(0,0,0);
+                        //camera.lookAt(wireGeometry.boundingSphere.center);
+                        //camera.position.set( center.z,center.y, center.x );
+                        controls.target = center;
+                        render();
+                        statusManager("model loaded succesfully");
                         console.log("got data");
 
                     }
@@ -188,7 +223,11 @@ String.prototype.format = function () {
              
                     btn1.addEventListener("click",function(){
                         infoOpened = !infoOpened;
-                        console.log(infoOpened);    
+                        console.log(infoOpened);
+                        if(POSTOpened&&infoOpened){
+                            POSTmenu.classList.toggle("menuMoveRight");
+                            POSTOpened = false;
+                        }    
                         menu.classList.toggle("menuMoveRight");
                     }); 
 
@@ -200,6 +239,8 @@ String.prototype.format = function () {
                         
                         document.getElementById("info1").textContent = document.getElementById("info1").textContent+"1";
                         console.log(scene);
+                        console.log(scene.getObjectByName("loadedMesh"));
+                        console.log(scene.getObjectByName("helper",true));
                     });
                     
 
@@ -215,13 +256,28 @@ String.prototype.format = function () {
 
 
                     var slider = document.getElementById("range");
-                    slider.addEventListener("change", function(){
-                        geometry.scale(2,2,2);
-                        console.log(slider.value);
-                        updateSplineOutline();  
-                    })
+                    if(slider)
+                        slider.addEventListener("change", function(){
+                            geometry.scale(2,2,2);
+                            console.log(slider.value);
+                            updateSplineOutline();  
+                        })
 
 
+                    var btn5 = document.getElementById('btn5');
+                    var POSTmenu = document.getElementById("POSTmenu");
+                    btn5.addEventListener("click",function(){
+                        POSTOpened = !POSTOpened;
+                        console.log(POSTOpened);
+                        if(POSTOpened&&infoOpened){
+                            menu.classList.toggle("menuMoveRight");
+                            infoOpened = false;
+                        }
+                            
+                        POSTmenu.classList.toggle("menuMoveRight");
+                    });
+                    POSTbtn = document.getElementById("POSTbtn");
+                    POSTbtn.addEventListener("click",POST);
 
 
                     container = document.getElementById( 'container' );
@@ -262,9 +318,9 @@ String.prototype.format = function () {
                     }
                     
     
-                    // var axes = new THREE.AxesHelper( 1000 );
-                    // axes.position.set( - 500, - 500, - 500 );
-                    // scene.add( axes );
+                    var axes = new THREE.AxesHelper( 1000 );
+                    axes.position.set( 0,0,0 );
+                    scene.add( axes );
     
                     renderer = new THREE.WebGLRenderer( { antialias: true } );
                     renderer.setPixelRatio( window.devicePixelRatio );
@@ -274,10 +330,11 @@ String.prototype.format = function () {
     
                     
                     if (OPTIONS.GUI){
-                        var gui = new dat.GUI();    
+                        var gui = new dat.GUI();   
+                        gui.domElement.addEventListener("change",render); // IMPORTANT!
                         gui.add( params, 'uniform' );
                         gui.add( params, 'tension', 0, 1 ).step( 0.01 ).onChange( function ( value ) {
-        
+                            render();
                             splines.uniform.tension = value;
                             updateSplineOutline();
         
@@ -286,6 +343,9 @@ String.prototype.format = function () {
                         gui.add( params, 'addPoint' );
                         gui.add( params, 'removePoint' );
                         gui.add( params, 'exportSpline' );
+                        gui.add( params, 'wireframe' );
+                        gui.add( params, 'helper' );
+                        gui.add( params, '_continiousRendering' );
                         gui.open();
                     }
 
@@ -293,8 +353,9 @@ String.prototype.format = function () {
         
         
                     // Controls 
-                    var controls = new THREE.OrbitControls( camera, renderer.domElement );
+                    controls = new THREE.OrbitControls( camera, renderer.domElement );
                     controls.damping = 0.2;
+                    controls.enableKeys = false;
                     controls.addEventListener( 'mousemove', function(event){
                         if(infoOpened){
                             document.getElementById("info1").textContent = event.object.id+" "+event.object.position.x+" "+event.object.position.y+" "+event.object.position.z;
@@ -472,8 +533,82 @@ String.prototype.format = function () {
 
 
                     document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+                    // document.addEventListener('mousewheel', function() {
+                    //     console.log("zoom  "+camera.zoom);
+                    //     document.getElementById("info").textContent = camera.zoom;
+                    // });
     
                 }
+
+                
+                function POST()
+                {
+                    var cmd = "C:\\Users\\TrofimovDM\\JS_projects\\backend\\java\\testJS.jar";
+
+                    
+                      var data = {};
+                      data['cmd'] = cmd;
+                      data['dacc'] = document.getElementById("POSTinput1").value;
+                      data['vox'] = document.getElementById("POSTinput2").value;
+                      data['file'] = document.getElementById("POSTinput0").textContent;
+                      console.log(document.getElementById("POSTinput0"));
+                    //   for (var i = 0, ii = form.length; i < ii; ++i) {
+                    //     var input = form[i];
+                    //     if (input.name) {
+                    //       data[input.name] = input.value;
+                    //     }
+                    //   }
+                    
+                      // construct an HTTP request
+                      var xhr = new XMLHttpRequest();
+                      xhr.open('POST', server, true);
+                      xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+                    
+                      // send the collected data as JSON
+                      xhr.send(JSON.stringify(data));
+                      xhr.onreadystatechange = function() { // Call a function when the state changes.
+                        if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+                            // Request finished. Do processing here.
+                            console.log(this)
+                        }
+                    }
+                    
+                      xhr.onloadend = function () {
+                        // done
+                      };
+                   
+
+
+                }
+
+
+                function sleep( sleepDuration ){
+                    var now = new Date().getTime();
+                    while(new Date().getTime() < now + sleepDuration){ /* do nothing */ } 
+                }
+
+
+                function statusManager(value){
+
+                    var TIMEOUT = 5000;
+
+                    document.getElementById("statusLine").textContent = value;
+                    var t = setTimeout(function(){ 
+                        document.getElementById("statusLine").textContent = ""; 
+                    }, TIMEOUT);
+                    document.getElementById("statusLine").addEventListener("mouseover", function(){
+                        console.log("mouseover");
+                        clearTimeout(t);
+                    });
+                    document.getElementById("statusLine").addEventListener("mouseleave", function(){
+                        console.log("mouseleave");
+                        t = setTimeout(function(){ 
+                            document.getElementById("statusLine").textContent = ""; 
+                        }, TIMEOUT);
+                    });
+                }
+
+
     
                 function addSplineObject( position ) {
     
@@ -601,7 +736,7 @@ String.prototype.format = function () {
 
 
                     document.getElementById("info2").textContent = "x: "+mouse.x+" y:"+mouse.y;
-    
+                    document.getElementById("info4").textContent = camera.zoom;
                 }
                     
                     
@@ -610,8 +745,14 @@ String.prototype.format = function () {
                 function animate() {
     
                     requestAnimationFrame( animate );
-                    render();
-                    
+
+                    if(params._continiousRendering)
+                        render();
+                    if(OnStart)
+                    {
+                        render();
+                        OnStart = false;
+                    }
                     
     
                 }
@@ -637,7 +778,12 @@ String.prototype.format = function () {
                     splines.uniform.mesh.visible = params.uniform;
                     splines.centripetal.mesh.visible = params.centripetal;
                     splines.chordal.mesh.visible = params.chordal;
+                    if(loadedMesh){
+                        loadedMesh.material.wireframe = params.wireframe;
+                        scene.getObjectByName("helper",true).visible = params.helper;
+                    }
                     renderer.render( scene, camera );
+                    
     
                 }
 
